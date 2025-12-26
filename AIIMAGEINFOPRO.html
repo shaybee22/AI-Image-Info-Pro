@@ -1,0 +1,2732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Info Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: #2a2a2a;
+            padding: 20px;
+            border-bottom: 2px solid #4a9eff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .header h1 {
+            color: #4a9eff;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .browser-notice {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 12px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .browser-notice.show {
+            display: block;
+        }
+
+        .browser-notice.success {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+        }
+
+        .btn {
+            background: #4a9eff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: #3a8eef;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background: #555;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #666;
+        }
+
+        .btn-secondary:hover {
+            background: #777;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-success {
+            background: #27ae60;
+        }
+
+        .btn-success:hover {
+            background: #219a52;
+        }
+
+        .btn-purple {
+            background: #9b59b6;
+        }
+
+        .btn-purple:hover {
+            background: #8e44ad;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .folder-tabs {
+            background: #2a2a2a;
+            padding: 10px 20px;
+            border-bottom: 1px solid #444;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            min-height: 50px;
+        }
+
+        .folder-tabs-label {
+            color: #999;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+
+        .saved-folder-btn {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
+            position: relative;
+        }
+
+        .saved-folder-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
+        }
+
+        .saved-folder-btn.active {
+            background: linear-gradient(135deg, #4a9eff 0%, #2980b9 100%);
+            box-shadow: 0 2px 8px rgba(74, 158, 255, 0.4);
+        }
+
+        .saved-folder-btn.cached {
+            border: 2px solid #f1c40f;
+        }
+
+        .saved-folder-btn .folder-icon {
+            font-size: 16px;
+        }
+
+        .saved-folder-btn .cache-indicator {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #f1c40f;
+            color: #333;
+            font-size: 10px;
+            padding: 2px 5px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .folder-tab {
+            background: #444;
+            color: #ccc;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .folder-tab.active {
+            background: #4a9eff;
+            color: white;
+        }
+
+        .folder-close {
+            background: rgba(255,255,255,0.3);
+            border: none;
+            color: white;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 10px;
+            margin-left: 5px;
+        }
+
+        .tabs {
+            display: flex;
+            background: #333;
+            border-bottom: 1px solid #555;
+        }
+
+        .tab {
+            background: #444;
+            border: none;
+            color: #ccc;
+            padding: 15px 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            background: #4a9eff;
+            color: white;
+            border-bottom: 3px solid #2980b9;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            min-height: calc(100vh - 300px);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .status-bar {
+            background: #222;
+            padding: 10px 20px;
+            border-top: 1px solid #444;
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+        }
+
+        .image-card {
+            background: #333;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            border: 3px solid transparent;
+        }
+
+        .image-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(74, 158, 255, 0.3);
+            border-color: #4a9eff;
+        }
+
+        .image-card.selected {
+            border-color: #4a9eff;
+            background: #404040;
+        }
+
+        .image-thumbnail {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .image-info {
+            padding: 15px;
+        }
+
+        .image-title {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #4a9eff;
+        }
+
+        .image-details {
+            font-size: 12px;
+            color: #ccc;
+            line-height: 1.4;
+        }
+
+        .image-prompt {
+            background: #222;
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            max-height: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .selection-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #4a9eff;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            display: none;
+        }
+
+        .image-card.selected .selection-indicator {
+            display: block;
+        }
+
+        .preset-actions {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: none;
+            gap: 5px;
+        }
+
+        .image-card:hover .preset-actions {
+            display: flex;
+        }
+
+        .action-btn {
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border: none;
+            padding: 5px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .action-btn:hover {
+            background: rgba(0,0,0,0.9);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            overflow-y: auto;
+            padding: 20px 0;
+        }
+
+        .modal-content {
+            background: #2a2a2a;
+            margin: 0 auto;
+            padding: 0;
+            width: 95%;
+            max-width: 900px;
+            border-radius: 10px;
+            max-height: calc(100vh - 40px);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .modal-content.small {
+            max-width: 550px;
+        }
+
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            max-height: calc(100vh - 200px);
+        }
+
+        .lora-container-wrapper {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #444;
+            border-radius: 5px;
+            background: #2a2a2a;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        .lora-container-wrapper::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .lora-container-wrapper::-webkit-scrollbar-track {
+            background: #333;
+            border-radius: 5px;
+        }
+
+        .lora-container-wrapper::-webkit-scrollbar-thumb {
+            background: #4a9eff;
+            border-radius: 5px;
+            border: 1px solid #333;
+        }
+
+        .lora-container-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #3a8eef;
+        }
+
+        .modal-header {
+            background: #4a9eff;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header.purple {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .modal-header .image-name {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+
+        .close {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: auto;
+        }
+
+        .form-group {
+            padding: 10px 20px;
+            border-bottom: 1px solid #444;
+        }
+
+        .form-group:last-child {
+            border-bottom: none;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #4a9eff;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 8px;
+            background: #444;
+            border: 1px solid #666;
+            border-radius: 5px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #4a9eff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(74, 158, 255, 0.3);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-col {
+            flex: 1;
+        }
+
+        .form-row .form-col label {
+            display: block;
+            margin-bottom: 5px;
+            color: #4a9eff;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .form-row .form-col input {
+            width: 100%;
+            padding: 8px;
+            background: #444;
+            border: 1px solid #666;
+            border-radius: 5px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .lora-group {
+            background: #333;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: grid;
+            grid-template-columns: auto 1fr auto auto auto;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .lora-label {
+            color: #4a9eff;
+            font-size: 14px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .lora-name {
+            background: #444 !important;
+            border: 1px solid #666 !important;
+            color: white !important;
+            padding: 8px !important;
+            border-radius: 5px !important;
+            font-size: 14px !important;
+            min-width: 200px;
+            width: 100%;
+        }
+
+        .lora-name:focus {
+            border-color: #4a9eff !important;
+            outline: none !important;
+            box-shadow: 0 0 5px rgba(74, 158, 255, 0.3) !important;
+        }
+
+        .lora-strength {
+            background: #444 !important;
+            border: 1px solid #666 !important;
+            color: white !important;
+            padding: 8px !important;
+            border-radius: 5px !important;
+            font-size: 14px !important;
+            width: 80px;
+        }
+
+        .lora-strength:focus {
+            border-color: #4a9eff !important;
+            outline: none !important;
+            box-shadow: 0 0 5px rgba(74, 158, 255, 0.3) !important;
+        }
+
+        .lora-remove {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .lora-remove:hover {
+            background: #c0392b;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            text-align: right;
+            border-top: 1px solid #444;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #444;
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4a9eff, #2980b9);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .folder-info {
+            background: #2a2a2a;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #4a9eff;
+        }
+
+        .folder-info h3 {
+            color: #4a9eff;
+            margin-bottom: 10px;
+        }
+
+        .folder-path {
+            font-family: 'Courier New', monospace;
+            background: #333;
+            padding: 8px;
+            border-radius: 5px;
+            word-break: break-all;
+        }
+
+        /* Manage Folders Modal Styles */
+        .saved-folders-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 15px 0;
+        }
+
+        .saved-folder-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #333;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #444;
+            transition: all 0.2s ease;
+        }
+
+        .saved-folder-item:hover {
+            border-color: #4a9eff;
+            background: #3a3a3a;
+        }
+
+        .saved-folder-item .folder-details {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .saved-folder-item .folder-icon {
+            font-size: 24px;
+        }
+
+        .saved-folder-item .folder-name {
+            font-weight: 600;
+            color: #4a9eff;
+            font-size: 15px;
+        }
+
+        .saved-folder-item .folder-meta {
+            font-size: 11px;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        .saved-folder-item .folder-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .saved-folder-item .action-btn-small {
+            background: #555;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .saved-folder-item .action-btn-small:hover {
+            background: #666;
+        }
+
+        .saved-folder-item .action-btn-small.delete {
+            background: #c0392b;
+        }
+
+        .saved-folder-item .action-btn-small.delete:hover {
+            background: #e74c3c;
+        }
+
+        .add-folder-section {
+            background: #333;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 15px;
+            border: 2px dashed #555;
+        }
+
+        .add-folder-section h4 {
+            color: #4a9eff;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .folder-input-row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .folder-input-row .input-group {
+            flex: 1;
+        }
+
+        .folder-input-row label {
+            display: block;
+            margin-bottom: 5px;
+            color: #ccc;
+            font-size: 12px;
+        }
+
+        .folder-input-row input {
+            width: 100%;
+            padding: 10px;
+            background: #444;
+            border: 1px solid #666;
+            border-radius: 5px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .folder-input-row input:focus {
+            border-color: #4a9eff;
+            outline: none;
+        }
+
+        .no-folders-msg {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-style: italic;
+        }
+
+        /* Preset Viewer Modal styles - Fixed for proper scrolling */
+        .preset-viewer {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+            height: calc(100vh - 180px);
+            max-height: calc(100vh - 180px);
+            overflow: hidden;
+        }
+
+        .preset-image-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .preset-full-image {
+            max-width: 100%;
+            max-height: calc(100vh - 240px);
+            object-fit: contain;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        .preset-metadata {
+            background: #333;
+            border-radius: 10px;
+            padding: 20px;
+            overflow-y: auto;
+            height: 100%;
+            max-height: calc(100vh - 220px);
+        }
+
+        .preset-metadata::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        .preset-metadata::-webkit-scrollbar-track {
+            background: #444;
+            border-radius: 6px;
+        }
+
+        .preset-metadata::-webkit-scrollbar-thumb {
+            background: #4a9eff;
+            border-radius: 6px;
+            border: 2px solid #444;
+        }
+
+        .preset-metadata::-webkit-scrollbar-thumb:hover {
+            background: #3a8eef;
+        }
+
+        .metadata-section {
+            margin-bottom: 25px;
+        }
+
+        .metadata-field .value {
+            background: #222;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            position: relative;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+            max-height: none;
+        }
+
+        .metadata-section h3 {
+            color: #4a9eff;
+            margin-bottom: 10px;
+            font-size: 16px;
+            border-bottom: 1px solid #555;
+            padding-bottom: 5px;
+        }
+
+        .metadata-field {
+            margin-bottom: 10px;
+        }
+
+        .metadata-field label {
+            display: block;
+            color: #999;
+            font-size: 12px;
+            margin-bottom: 2px;
+            text-transform: uppercase;
+        }
+
+        .metadata-field .value {
+            background: #222;
+            padding: 8px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #4a9eff;
+            color: white;
+            border: none;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        .copy-btn:hover {
+            background: #3a8eef;
+        }
+
+        .lora-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #444;
+        }
+
+        .lora-list.empty {
+            background: #333;
+            color: #666;
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        .lora-item {
+            background: #222;
+            padding: 12px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #444;
+            min-height: 40px;
+        }
+
+        .lora-item .lora-name {
+            font-family: 'Courier New', monospace;
+            color: #4a9eff;
+            font-weight: bold;
+            word-break: break-all;
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        .lora-item .lora-strength {
+            background: #333;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            color: #ccc;
+            white-space: nowrap;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        .loading {
+            animation: pulse 1.5s infinite;
+        }
+
+        @media (max-width: 768px) {
+            .preset-viewer {
+                grid-template-columns: 1fr;
+                height: calc(100vh - 120px);
+                max-height: calc(100vh - 120px);
+            }
+            
+            .preset-image-container {
+                max-height: 300px;
+            }
+            
+            .preset-full-image {
+                max-height: 250px;
+            }
+            
+            .preset-metadata {
+                max-height: none;
+                height: auto;
+                min-height: 300px;
+            }
+            
+            .modal-content {
+                width: 98%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎨 AI Image Info Pro</h1>
+        <div class="header-controls">
+            <button id="manageFolders" class="btn btn-purple">📂 Manage Folders</button>
+            <button id="processSelected" class="btn" disabled>⚙️ Process Selected</button>
+            <button id="processAll" class="btn btn-secondary" disabled>⚙️ Process All New</button>
+            <button id="exportGallery" class="btn btn-secondary">🌐 Export Gallery</button>
+            <button id="clearAll" class="btn btn-danger">🗑️ Clear All Data</button>
+        </div>
+        <div id="browserNotice" class="browser-notice"></div>
+        <div class="progress-bar" id="progressBar" style="display: none;">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <div class="folder-tabs" id="folderTabs">
+        <span class="folder-tabs-label">📁 Active Folders:</span>
+        <!-- Saved folder buttons will be added dynamically -->
+    </div>
+
+    <!-- Hidden file input for folder selection (fallback) -->
+    <input type="file" id="folderInput" class="file-input" webkitdirectory multiple>
+
+    <div class="tabs">
+        <button class="tab active" data-tab="new">🆕 New Images (<span id="newCount">0</span>)</button>
+        <button class="tab" data-tab="processed">✅ Processed Presets (<span id="processedCount">0</span>)</button>
+    </div>
+
+    <div class="tab-content active" id="new-tab">
+        <div class="folder-info" id="folderInfo" style="display: none;">
+            <h3>📁 Current Working Folder</h3>
+            <div class="folder-path" id="currentFolderPath">No folder selected</div>
+            <p style="margin-top: 10px; color: #ccc; font-size: 14px;">
+                💡 Tip: Your presets are automatically saved in browser memory for this folder
+            </p>
+        </div>
+        
+        <div id="newImagesGallery" class="gallery">
+            <div class="empty-state">
+                <h3>No Images Loaded</h3>
+                <p>Click "📂 Manage Folders" to add a folder, then click the folder button to load images</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="tab-content" id="processed-tab">
+        <div id="processedPresetsGallery" class="gallery">
+            <div class="empty-state">
+                <h3>No Processed Presets</h3>
+                <p>Process some images from the "New Images" tab to build your preset collection</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="status-bar">
+        <span id="statusText">Ready - Click "Manage Folders" to add folders, then click a folder button to load images</span>
+    </div>
+
+    <!-- Manage Folders Modal -->
+    <div id="manageFoldersModal" class="modal">
+        <div class="modal-content small">
+            <div class="modal-header purple">
+                <div>
+                    <h2>📂 Manage Folders</h2>
+                    <div class="image-name">Add and organize your image folders</div>
+                </div>
+                <span class="close">&times;</span>
+            </div>
+            
+            <div class="modal-body" style="padding: 20px;">
+                <h4 style="color: #ccc; margin-bottom: 15px; font-size: 13px;">Saved Folders</h4>
+                <div class="saved-folders-list" id="savedFoldersList">
+                    <div class="no-folders-msg">No folders saved yet. Add one below!</div>
+                </div>
+
+                <div class="add-folder-section">
+                    <h4>➕ Add New Folder</h4>
+                    <div class="folder-input-row">
+                        <div class="input-group">
+                            <label for="newFolderName">Folder Name</label>
+                            <input type="text" id="newFolderName" placeholder="e.g., My AI Art, Character Portraits...">
+                        </div>
+                        <button id="browseFolderBtn" class="btn btn-secondary" style="margin-bottom: 0;">📁 Browse</button>
+                        <button id="saveFolderBtn" class="btn btn-success" style="margin-bottom: 0;">💾 Save</button>
+                    </div>
+                    <div id="selectedFolderPath" style="margin-top: 10px; font-size: 12px; color: #888; display: none;">
+                        <strong>Selected:</strong> <span id="selectedPathText"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="closeManageFolders" class="btn btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Folder Modal -->
+    <div id="editFolderModal" class="modal">
+        <div class="modal-content small">
+            <div class="modal-header purple">
+                <div>
+                    <h2>✏️ Edit Folder</h2>
+                    <div class="image-name">Update folder name</div>
+                </div>
+                <span class="close">&times;</span>
+            </div>
+            
+            <div class="modal-body" style="padding: 20px;">
+                <div class="form-group">
+                    <label for="editFolderName">Folder Name</label>
+                    <input type="text" id="editFolderName" placeholder="Enter folder name">
+                </div>
+                <input type="hidden" id="editFolderId">
+            </div>
+
+            <div class="modal-footer">
+                <button id="cancelEditFolder" class="btn btn-secondary">Cancel</button>
+                <button id="saveEditFolder" class="btn btn-success">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Metadata Input Modal -->
+    <div id="metadataModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2 id="modalTitle">📝 Create Preset</h2>
+                    <div class="image-name" id="processingImageName">Processing image...</div>
+                </div>
+                <span class="close">&times;</span>
+            </div>
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="presetName">Preset Name</label>
+                    <input type="text" id="presetName" placeholder="Enter a name for this preset">
+                </div>
+
+                <div class="form-group">
+                    <label for="positivePrompt">Positive Prompt</label>
+                    <textarea id="positivePrompt" rows="4" placeholder="Enter the positive prompt used to generate this image"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="negativePrompt">Negative Prompt</label>
+                    <textarea id="negativePrompt" rows="3" placeholder="Enter the negative prompt used"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="checkpoint">Checkpoint/Model</label>
+                    <input type="text" id="checkpoint" placeholder="e.g., realvisxlV40.safetensors">
+                </div>
+
+                <div class="form-group">
+                    <label>LoRAs</label>
+                    <div class="lora-container-wrapper">
+                        <div id="loraContainer">
+                            <!-- LoRA entries will be added dynamically -->
+                        </div>
+                    </div>
+                    <button type="button" id="addLora" class="btn btn-secondary">+ Add LoRA</button>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <label for="cfgScale">CFG Scale</label>
+                            <input type="number" id="cfgScale" value="7.5" step="0.1" min="1" max="30">
+                        </div>
+                        <div class="form-col">
+                            <label for="steps">Steps</label>
+                            <input type="number" id="steps" value="25" min="1" max="200">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="sampler">Sampler</label>
+                    <input type="text" id="sampler" value="DPM++ 2M Karras" placeholder="e.g., DPM++ 2M Karras">
+                </div>
+
+                <div class="form-group">
+                    <label for="seed">Seed (Optional)</label>
+                    <input type="text" id="seed" placeholder="Enter seed or leave empty">
+                </div>
+
+                <div class="form-group">
+                    <label for="notes">Notes (Optional)</label>
+                    <textarea id="notes" rows="3" placeholder="Any additional notes about this preset"></textarea>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="cancelPreset" class="btn btn-secondary">Cancel (Esc)</button>
+                <button id="savePreset" class="btn">Save Preset (Ctrl+Enter)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preset Viewer Modal -->
+    <div id="presetViewerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2>🎨 Preset Viewer</h2>
+                    <div class="image-name" id="viewerImageName">Preset details</div>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button id="editPreset" class="btn btn-secondary">✏️ Edit</button>
+                    <button id="downloadPreset" class="btn btn-secondary">💾 Download</button>
+                    <span class="close">&times;</span>
+                </div>
+            </div>
+            
+            <div class="preset-viewer">
+                <div class="preset-image-container">
+                    <img id="presetViewerImage" class="preset-full-image" src="" alt="Preset Image">
+                </div>
+                
+                <div class="preset-metadata">
+                    <div class="metadata-section">
+                        <h3>🏷️ Basic Info</h3>
+                        <div class="metadata-field">
+                            <label>Preset Name</label>
+                            <div class="value" id="viewerPresetName">
+                                <button class="copy-btn" onclick="copyToClipboard(this.parentElement)">Copy</button>
+                            </div>
+                        </div>
+                        <div class="metadata-field">
+                            <label>Model/Checkpoint</label>
+                            <div class="value" id="viewerCheckpoint">
+                                <button class="copy-btn" onclick="copyToClipboard(this.parentElement)">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="metadata-section">
+                        <h3>📝 Prompts</h3>
+                        <div class="metadata-field">
+                            <label>Positive Prompt</label>
+                            <div class="value" id="viewerPositivePrompt">
+                                <button class="copy-btn" onclick="copyToClipboard(this.parentElement)">Copy</button>
+                            </div>
+                        </div>
+                        <div class="metadata-field">
+                            <label>Negative Prompt</label>
+                            <div class="value" id="viewerNegativePrompt">
+                                <button class="copy-btn" onclick="copyToClipboard(this.parentElement)">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="metadata-section">
+                        <h3>⚙️ Generation Settings</h3>
+                        <div class="metadata-field">
+                            <label>CFG Scale</label>
+                            <div class="value" id="viewerCfg">
+                                <button class="copy-btn" onclick="copyToClipboard(this.parentElement)">Copy</button>
+                            </div>
+                        </div>
+                        <div class="metadata-field">
+                            <label>Steps</label>
+                            <div class="value" id="viewerSteps">
+                                <button class="copy-btn" onclick="copyToClipboard(this.parentElement)">Copy</button>
+                            </div>
+                        </div>
+                        <div class="metadata-field">
+                            <label>Sampler</label>
+                            <div class="value" id="viewerSampler">
+                                <button class="copy-btn" onclick="copyToClipboard(this.parentElement)">Copy</button>
+                            </div>
+                        </div>
+                        <div class="metadata-field">
+                            <label>Seed</label>
+                            <div class="value" id="viewerSeed">
+                                <button class="copy-btn" onclick="copyToClipboard(this.parentElement)">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="metadata-section" id="loraSection">
+                        <h3>🎭 LoRAs</h3>
+                        <div class="lora-list" id="viewerLoraList">
+                            <!-- LoRAs will be populated here -->
+                        </div>
+                    </div>
+
+                    <div class="metadata-section" id="notesSection">
+                        <h3>📋 Notes</h3>
+                        <div class="metadata-field">
+                            <div class="value" id="viewerNotes">
+                                <button class="copy-btn" onclick="copyToClipboard(this.parentElement)">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global copy function
+        function copyToClipboard(element) {
+            const text = element.textContent.replace('Copy', '').trim();
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = element.querySelector('.copy-btn');
+                const originalText = btn.textContent;
+                btn.textContent = '✓';
+                btn.style.background = '#27ae60';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '#4a9eff';
+                }, 1000);
+            });
+        }
+
+        class AIPresetManagerFixed {
+            constructor() {
+                this.savedFolders = []; // Array of {id, name, directoryHandle (for Chrome), cachedImages}
+                this.folders = new Map(); // Map of folder paths to their data
+                this.currentFolder = null;
+                this.currentFolderId = null;
+                this.newImages = [];
+                this.processedPresets = [];
+                this.selectedImages = new Set();
+                this.currentProcessingImage = null;
+                this.currentEditingPreset = null;
+                this.pendingFolderHandle = null;
+                this.pendingFolderFiles = null;
+                
+                // Check for File System Access API support
+                this.hasFileSystemAccess = 'showDirectoryPicker' in window;
+                
+                this.initializeElements();
+                this.bindEvents();
+                this.loadFromStorage();
+                this.renderSavedFolderButtons();
+                this.updateUI();
+                this.showBrowserNotice();
+            }
+
+            showBrowserNotice() {
+                const notice = document.getElementById('browserNotice');
+                if (this.hasFileSystemAccess) {
+                    notice.textContent = '✓ File System Access API available - folders will load instantly after first access!';
+                    notice.classList.add('show', 'success');
+                } else {
+                    notice.textContent = '⚠️ Firefox detected - first folder load requires browsing, then instant switching between cached folders';
+                    notice.classList.add('show');
+                }
+                
+                setTimeout(() => {
+                    notice.classList.remove('show');
+                }, 5000);
+            }
+
+            initializeElements() {
+                // Main elements
+                this.folderInput = document.getElementById('folderInput');
+                this.manageFoldersBtn = document.getElementById('manageFolders');
+                this.processSelectedBtn = document.getElementById('processSelected');
+                this.processAllBtn = document.getElementById('processAll');
+                this.exportGalleryBtn = document.getElementById('exportGallery');
+                this.clearAllBtn = document.getElementById('clearAll');
+                
+                // Folder tabs
+                this.folderTabs = document.getElementById('folderTabs');
+                
+                // Galleries
+                this.newImagesGallery = document.getElementById('newImagesGallery');
+                this.processedPresetsGallery = document.getElementById('processedPresetsGallery');
+                
+                // Counters
+                this.newCount = document.getElementById('newCount');
+                this.processedCount = document.getElementById('processedCount');
+                
+                // Status and progress
+                this.statusText = document.getElementById('statusText');
+                this.progressBar = document.getElementById('progressBar');
+                this.progressFill = document.getElementById('progressFill');
+                
+                // Folder info
+                this.folderInfo = document.getElementById('folderInfo');
+                this.currentFolderPath = document.getElementById('currentFolderPath');
+                
+                // Modal elements
+                this.manageFoldersModal = document.getElementById('manageFoldersModal');
+                this.editFolderModal = document.getElementById('editFolderModal');
+                this.metadataModal = document.getElementById('metadataModal');
+                this.presetViewerModal = document.getElementById('presetViewerModal');
+                this.loraContainer = document.getElementById('loraContainer');
+                
+                // Manage folders elements
+                this.savedFoldersList = document.getElementById('savedFoldersList');
+                this.newFolderName = document.getElementById('newFolderName');
+                this.browseFolderBtn = document.getElementById('browseFolderBtn');
+                this.saveFolderBtn = document.getElementById('saveFolderBtn');
+                this.selectedFolderPath = document.getElementById('selectedFolderPath');
+                this.selectedPathText = document.getElementById('selectedPathText');
+            }
+
+            bindEvents() {
+                // Manage Folders button
+                this.manageFoldersBtn.addEventListener('click', () => this.showManageFoldersModal());
+                
+                // File input for folder selection (fallback for Firefox)
+                this.folderInput.addEventListener('change', (e) => this.handleFolderSelectFallback(e));
+                
+                // Browse folder button
+                this.browseFolderBtn.addEventListener('click', () => this.browseForFolder());
+                this.saveFolderBtn.addEventListener('click', () => this.saveNewFolder());
+                document.getElementById('closeManageFolders').addEventListener('click', () => {
+                    this.manageFoldersModal.style.display = 'none';
+                });
+                
+                // Edit Folder modal events
+                document.getElementById('cancelEditFolder').addEventListener('click', () => {
+                    this.editFolderModal.style.display = 'none';
+                });
+                document.getElementById('saveEditFolder').addEventListener('click', () => this.saveEditedFolder());
+                
+                // Process buttons
+                this.processSelectedBtn.addEventListener('click', () => this.processSelectedImages());
+                this.processAllBtn.addEventListener('click', () => this.processAllImages());
+                
+                // Export and clear
+                this.exportGalleryBtn.addEventListener('click', () => this.exportGallery());
+                this.clearAllBtn.addEventListener('click', () => this.clearAllData());
+                
+                // Tab switching
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.addEventListener('click', (e) => this.switchTab(e.target.dataset.tab));
+                });
+                
+                // Modal events
+                document.querySelectorAll('.close').forEach(closeBtn => {
+                    closeBtn.addEventListener('click', () => this.closeActiveModal());
+                });
+                document.getElementById('cancelPreset').addEventListener('click', () => this.closeActiveModal());
+                document.getElementById('savePreset').addEventListener('click', () => this.saveCurrentPreset());
+                document.getElementById('addLora').addEventListener('click', () => this.addLoraEntry());
+                
+                // Preset viewer events
+                document.getElementById('editPreset').addEventListener('click', () => this.editCurrentPreset());
+                document.getElementById('downloadPreset').addEventListener('click', () => this.downloadCurrentPreset());
+                
+                // Click outside modal to close
+                window.addEventListener('click', (e) => {
+                    if (e.target === this.metadataModal || e.target === this.presetViewerModal) {
+                        this.closeActiveModal();
+                    }
+                    if (e.target === this.manageFoldersModal) {
+                        this.manageFoldersModal.style.display = 'none';
+                    }
+                    if (e.target === this.editFolderModal) {
+                        this.editFolderModal.style.display = 'none';
+                    }
+                });
+
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (this.metadataModal.style.display === 'block') {
+                        if (e.key === 'Escape') {
+                            this.closeActiveModal();
+                        }
+                        if (e.ctrlKey && e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+                            e.preventDefault();
+                            this.saveCurrentPreset();
+                        }
+                    }
+                    if (this.presetViewerModal.style.display === 'block') {
+                        if (e.key === 'Escape') {
+                            this.closeActiveModal();
+                        }
+                        if (e.key === 'e' || e.key === 'E') {
+                            this.editCurrentPreset();
+                        }
+                    }
+                    if (this.manageFoldersModal.style.display === 'block') {
+                        if (e.key === 'Escape') {
+                            this.manageFoldersModal.style.display = 'none';
+                        }
+                    }
+                    if (this.editFolderModal.style.display === 'block') {
+                        if (e.key === 'Escape') {
+                            this.editFolderModal.style.display = 'none';
+                        }
+                    }
+                });
+            }
+
+            async browseForFolder() {
+                if (this.hasFileSystemAccess) {
+                    try {
+                        const handle = await window.showDirectoryPicker();
+                        this.pendingFolderHandle = handle;
+                        this.pendingFolderFiles = null;
+                        this.selectedPathText.textContent = handle.name;
+                        this.selectedFolderPath.style.display = 'block';
+                        
+                        if (!this.newFolderName.value.trim()) {
+                            this.newFolderName.value = handle.name;
+                        }
+                    } catch (err) {
+                        if (err.name !== 'AbortError') {
+                            console.error('Folder selection error:', err);
+                        }
+                    }
+                } else {
+                    // Fallback for Firefox
+                    this.pendingFolderHandle = null;
+                    this.folderInput.click();
+                }
+            }
+
+            handleFolderSelectFallback(event) {
+                const files = Array.from(event.target.files);
+                if (files.length === 0) return;
+
+                const firstFile = files[0];
+                const pathParts = firstFile.webkitRelativePath.split('/');
+                const folderPath = pathParts[0];
+
+                // Check if we're in the manage folders modal (adding new folder)
+                if (this.manageFoldersModal.style.display === 'block') {
+                    this.pendingFolderFiles = files;
+                    this.pendingFolderHandle = null;
+                    this.selectedPathText.textContent = folderPath;
+                    this.selectedFolderPath.style.display = 'block';
+                    
+                    if (!this.newFolderName.value.trim()) {
+                        this.newFolderName.value = folderPath;
+                    }
+                } else if (this.currentFolderId) {
+                    // We're loading images for an existing folder (Firefox fallback)
+                    this.loadImagesFromFiles(files, this.currentFolderId);
+                }
+                
+                this.folderInput.value = '';
+            }
+
+            async saveNewFolder() {
+                const name = this.newFolderName.value.trim();
+                
+                if (!name) {
+                    alert('Please enter a folder name.');
+                    return;
+                }
+
+                if (!this.pendingFolderHandle && !this.pendingFolderFiles) {
+                    alert('Please browse and select a folder first.');
+                    return;
+                }
+
+                const newFolder = {
+                    id: 'folder_' + Date.now(),
+                    name: name,
+                    hasDirectoryHandle: !!this.pendingFolderHandle,
+                    cachedImages: [] // Will store image data for instant switching
+                };
+
+                // Store the directory handle in IndexedDB for Chrome/Edge
+                if (this.pendingFolderHandle) {
+                    await this.storeDirectoryHandle(newFolder.id, this.pendingFolderHandle);
+                }
+
+                this.savedFolders.push(newFolder);
+                this.saveFoldersToStorage();
+                
+                // Load images immediately
+                this.currentFolderId = newFolder.id;
+                this.manageFoldersModal.style.display = 'none';
+                
+                if (this.pendingFolderHandle) {
+                    await this.loadImagesFromHandle(this.pendingFolderHandle, newFolder.id);
+                } else if (this.pendingFolderFiles) {
+                    await this.loadImagesFromFiles(this.pendingFolderFiles, newFolder.id);
+                }
+                
+                this.pendingFolderHandle = null;
+                this.pendingFolderFiles = null;
+                this.newFolderName.value = '';
+                this.selectedFolderPath.style.display = 'none';
+                
+                this.renderSavedFolderButtons();
+            }
+
+            async storeDirectoryHandle(folderId, handle) {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open('AIPresetManager', 1);
+                    
+                    request.onerror = () => reject(request.error);
+                    
+                    request.onupgradeneeded = (event) => {
+                        const db = event.target.result;
+                        if (!db.objectStoreNames.contains('directoryHandles')) {
+                            db.createObjectStore('directoryHandles', { keyPath: 'id' });
+                        }
+                    };
+                    
+                    request.onsuccess = (event) => {
+                        const db = event.target.result;
+                        const transaction = db.transaction(['directoryHandles'], 'readwrite');
+                        const store = transaction.objectStore('directoryHandles');
+                        store.put({ id: folderId, handle: handle });
+                        transaction.oncomplete = () => resolve();
+                        transaction.onerror = () => reject(transaction.error);
+                    };
+                });
+            }
+
+            async getDirectoryHandle(folderId) {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open('AIPresetManager', 1);
+                    
+                    request.onerror = () => resolve(null);
+                    
+                    request.onupgradeneeded = (event) => {
+                        const db = event.target.result;
+                        if (!db.objectStoreNames.contains('directoryHandles')) {
+                            db.createObjectStore('directoryHandles', { keyPath: 'id' });
+                        }
+                    };
+                    
+                    request.onsuccess = (event) => {
+                        const db = event.target.result;
+                        const transaction = db.transaction(['directoryHandles'], 'readonly');
+                        const store = transaction.objectStore('directoryHandles');
+                        const getRequest = store.get(folderId);
+                        
+                        getRequest.onsuccess = () => {
+                            resolve(getRequest.result ? getRequest.result.handle : null);
+                        };
+                        getRequest.onerror = () => resolve(null);
+                    };
+                });
+            }
+
+            async loadFolderFromButton(folderId) {
+                const folder = this.savedFolders.find(f => f.id === folderId);
+                if (!folder) return;
+                
+                this.currentFolderId = folderId;
+                this.manageFoldersModal.style.display = 'none';
+                
+                // Check if we have cached images for instant switching
+                if (folder.cachedImages && folder.cachedImages.length > 0) {
+                    this.loadFromCache(folder);
+                    return;
+                }
+                
+                // Try to use stored directory handle (Chrome/Edge)
+                if (this.hasFileSystemAccess && folder.hasDirectoryHandle) {
+                    const handle = await this.getDirectoryHandle(folderId);
+                    if (handle) {
+                        // Verify permission
+                        const permission = await handle.queryPermission({ mode: 'read' });
+                        if (permission === 'granted') {
+                            await this.loadImagesFromHandle(handle, folderId);
+                            return;
+                        }
+                        
+                        // Request permission
+                        const newPermission = await handle.requestPermission({ mode: 'read' });
+                        if (newPermission === 'granted') {
+                            await this.loadImagesFromHandle(handle, folderId);
+                            return;
+                        }
+                    }
+                }
+                
+                // Fallback: need to browse again
+                this.updateStatus(`Select the folder for "${folder.name}"...`);
+                this.folderInput.click();
+            }
+
+            loadFromCache(folder) {
+                this.updateStatus(`Loading ${folder.name} from cache...`);
+                
+                const folderPath = folder.cachedPath || folder.name;
+                this.switchToFolder(folderPath);
+                
+                // Restore cached images
+                this.newImages = folder.cachedImages.filter(img => {
+                    return !this.processedPresets.some(p => p.fileHash === img.fileHash);
+                });
+                
+                if (this.currentFolder) {
+                    this.folders.get(this.currentFolder).newImages = this.newImages;
+                }
+                
+                this.renderSavedFolderButtons();
+                this.updateUI();
+                this.updateStatus(`Loaded ${this.newImages.length} images from "${folder.name}" (cached)`);
+            }
+
+            async loadImagesFromHandle(handle, folderId) {
+                const imageExtensions = ['.png', '.jpg', '.jpeg', '.webp', '.bmp', '.tiff'];
+                
+                this.updateStatus('Loading images...');
+                this.showProgress(true);
+                
+                const folder = this.savedFolders.find(f => f.id === folderId);
+                const folderPath = handle.name;
+                
+                this.switchToFolder(folderPath);
+                
+                // Clear existing new images
+                this.newImages = [];
+                const cachedImages = [];
+                
+                let fileCount = 0;
+                const entries = [];
+                
+                for await (const entry of handle.values()) {
+                    if (entry.kind === 'file') {
+                        const ext = entry.name.toLowerCase().slice(entry.name.lastIndexOf('.'));
+                        if (imageExtensions.includes(ext)) {
+                            entries.push(entry);
+                        }
+                    }
+                }
+                
+                for (let i = 0; i < entries.length; i++) {
+                    const fileHandle = entries[i];
+                    const file = await fileHandle.getFile();
+                    const progress = ((i + 1) / entries.length) * 100;
+                    this.updateProgress(progress);
+                    
+                    const fileHash = await this.getFileHash(file);
+                    const isProcessed = this.processedPresets.some(p => p.fileHash === fileHash);
+                    
+                    const url = URL.createObjectURL(file);
+                    
+                    const imageData = {
+                        file: file,
+                        name: file.name,
+                        size: file.size,
+                        fileHash: fileHash,
+                        url: url,
+                        relativePath: `${folderPath}/${file.name}`
+                    };
+                    
+                    cachedImages.push(imageData);
+                    
+                    if (!isProcessed) {
+                        this.newImages.push(imageData);
+                    }
+                    
+                    if (i % 10 === 0) {
+                        await new Promise(resolve => setTimeout(resolve, 1));
+                    }
+                }
+                
+                // Cache images for instant switching
+                if (folder) {
+                    folder.cachedImages = cachedImages;
+                    folder.cachedPath = folderPath;
+                }
+                
+                if (this.currentFolder) {
+                    this.folders.get(this.currentFolder).newImages = this.newImages;
+                }
+                
+                this.showProgress(false);
+                this.renderSavedFolderButtons();
+                this.updateUI();
+                this.updateStatus(`Loaded ${this.newImages.length} new images from "${folderPath}"`);
+            }
+
+            async loadImagesFromFiles(files, folderId) {
+                const imageExtensions = ['.png', '.jpg', '.jpeg', '.webp', '.bmp', '.tiff'];
+                
+                this.updateStatus('Loading images...');
+                this.showProgress(true);
+                
+                const folder = this.savedFolders.find(f => f.id === folderId);
+                const firstFile = files[0];
+                const pathParts = firstFile.webkitRelativePath.split('/');
+                const folderPath = pathParts[0];
+                
+                this.switchToFolder(folderPath);
+                
+                const imageFiles = files.filter(file => {
+                    const ext = file.name.toLowerCase().slice(file.name.lastIndexOf('.'));
+                    return imageExtensions.includes(ext);
+                });
+
+                // Clear existing new images
+                this.newImages = [];
+                const cachedImages = [];
+                
+                for (let i = 0; i < imageFiles.length; i++) {
+                    const file = imageFiles[i];
+                    const progress = ((i + 1) / imageFiles.length) * 100;
+                    this.updateProgress(progress);
+                    
+                    const fileHash = await this.getFileHash(file);
+                    const isProcessed = this.processedPresets.some(p => p.fileHash === fileHash);
+                    
+                    const imageData = {
+                        file: file,
+                        name: file.name,
+                        size: file.size,
+                        fileHash: fileHash,
+                        url: URL.createObjectURL(file),
+                        relativePath: file.webkitRelativePath
+                    };
+                    
+                    cachedImages.push(imageData);
+                    
+                    if (!isProcessed) {
+                        this.newImages.push(imageData);
+                    }
+                    
+                    if (i % 10 === 0) {
+                        await new Promise(resolve => setTimeout(resolve, 1));
+                    }
+                }
+                
+                // Cache images for instant switching
+                if (folder) {
+                    folder.cachedImages = cachedImages;
+                    folder.cachedPath = folderPath;
+                }
+                
+                if (this.currentFolder) {
+                    this.folders.get(this.currentFolder).newImages = this.newImages;
+                }
+                
+                this.showProgress(false);
+                this.renderSavedFolderButtons();
+                this.updateUI();
+                this.updateStatus(`Loaded ${this.newImages.length} new images from "${folderPath}"`);
+            }
+
+            showManageFoldersModal() {
+                this.renderSavedFoldersList();
+                this.newFolderName.value = '';
+                this.pendingFolderHandle = null;
+                this.pendingFolderFiles = null;
+                this.selectedFolderPath.style.display = 'none';
+                this.manageFoldersModal.style.display = 'block';
+            }
+
+            renderSavedFoldersList() {
+                if (this.savedFolders.length === 0) {
+                    this.savedFoldersList.innerHTML = '<div class="no-folders-msg">No folders saved yet. Add one below!</div>';
+                    return;
+                }
+
+                this.savedFoldersList.innerHTML = this.savedFolders.map(folder => {
+                    const isCached = folder.cachedImages && folder.cachedImages.length > 0;
+                    return `
+                        <div class="saved-folder-item" data-id="${folder.id}">
+                            <div class="folder-details">
+                                <span class="folder-icon">📁</span>
+                                <div>
+                                    <div class="folder-name">${folder.name}</div>
+                                    <div class="folder-meta">
+                                        ${isCached ? `✓ ${folder.cachedImages.length} images cached` : 'Not loaded yet'}
+                                        ${folder.hasDirectoryHandle ? ' • Persistent access' : ''}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="folder-actions">
+                                <button class="action-btn-small" onclick="app.editFolder('${folder.id}')">✏️ Edit</button>
+                                <button class="action-btn-small delete" onclick="app.deleteFolder('${folder.id}')">🗑️ Delete</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            editFolder(folderId) {
+                const folder = this.savedFolders.find(f => f.id === folderId);
+                if (!folder) return;
+                
+                document.getElementById('editFolderName').value = folder.name;
+                document.getElementById('editFolderId').value = folder.id;
+                this.editFolderModal.style.display = 'block';
+            }
+
+            saveEditedFolder() {
+                const folderId = document.getElementById('editFolderId').value;
+                const newName = document.getElementById('editFolderName').value.trim();
+                
+                if (!newName) {
+                    alert('Please enter a folder name.');
+                    return;
+                }
+
+                const folder = this.savedFolders.find(f => f.id === folderId);
+                if (folder) {
+                    folder.name = newName;
+                    this.saveFoldersToStorage();
+                    this.renderSavedFoldersList();
+                    this.renderSavedFolderButtons();
+                }
+                
+                this.editFolderModal.style.display = 'none';
+            }
+
+            async deleteFolder(folderId) {
+                if (!confirm('Delete this folder configuration? (This won\'t delete the actual files on your computer)')) {
+                    return;
+                }
+
+                // Remove from IndexedDB
+                try {
+                    const request = indexedDB.open('AIPresetManager', 1);
+                    request.onsuccess = (event) => {
+                        const db = event.target.result;
+                        const transaction = db.transaction(['directoryHandles'], 'readwrite');
+                        const store = transaction.objectStore('directoryHandles');
+                        store.delete(folderId);
+                    };
+                } catch (e) {
+                    console.log('Could not remove from IndexedDB');
+                }
+
+                this.savedFolders = this.savedFolders.filter(f => f.id !== folderId);
+                this.saveFoldersToStorage();
+                this.renderSavedFoldersList();
+                this.renderSavedFolderButtons();
+            }
+
+            renderSavedFolderButtons() {
+                // Clear existing buttons except the label
+                const existingButtons = this.folderTabs.querySelectorAll('.saved-folder-btn');
+                existingButtons.forEach(btn => btn.remove());
+                
+                // Add saved folder buttons
+                this.savedFolders.forEach(folder => {
+                    const btn = document.createElement('button');
+                    btn.className = 'saved-folder-btn';
+                    
+                    const isCached = folder.cachedImages && folder.cachedImages.length > 0;
+                    const isActive = this.currentFolderId === folder.id;
+                    
+                    if (isActive) btn.classList.add('active');
+                    if (isCached) btn.classList.add('cached');
+                    
+                    btn.innerHTML = `
+                        <span class="folder-icon">📁</span>
+                        ${folder.name}
+                        ${isCached ? '<span class="cache-indicator">⚡</span>' : ''}
+                    `;
+                    
+                    btn.title = isCached ? 'Click to instantly switch (cached)' : 'Click to load images';
+                    
+                    btn.addEventListener('click', () => this.loadFolderFromButton(folder.id));
+                    this.folderTabs.appendChild(btn);
+                });
+                
+                // Show hint if no folders
+                if (this.savedFolders.length === 0) {
+                    const hint = document.createElement('span');
+                    hint.style.color = '#888';
+                    hint.style.fontSize = '13px';
+                    hint.style.fontStyle = 'italic';
+                    hint.innerHTML = 'No folders added yet. Click "Manage Folders" to add some.';
+                    this.folderTabs.appendChild(hint);
+                }
+            }
+
+            switchToFolder(folderPath) {
+                this.currentFolder = folderPath;
+                
+                // Create folder data if doesn't exist
+                if (!this.folders.has(folderPath)) {
+                    this.folders.set(folderPath, {
+                        newImages: [],
+                        processedPresets: [],
+                        selectedImages: new Set()
+                    });
+                }
+                
+                // Load current folder data
+                const folderData = this.folders.get(folderPath);
+                this.newImages = folderData.newImages;
+                this.processedPresets = folderData.processedPresets;
+                this.selectedImages = folderData.selectedImages;
+                
+                // Update UI
+                this.currentFolderPath.textContent = folderPath;
+                this.folderInfo.style.display = 'block';
+            }
+
+            async getFileHash(file) {
+                const data = `${file.name}-${file.size}-${file.lastModified}`;
+                const encoder = new TextEncoder();
+                const encodedData = encoder.encode(data);
+                const hashBuffer = await crypto.subtle.digest('SHA-256', encodedData);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            }
+
+            renderNewImages() {
+                const gallery = this.newImagesGallery;
+                
+                if (this.newImages.length === 0) {
+                    if (this.currentFolder) {
+                        gallery.innerHTML = `
+                            <div class="empty-state">
+                                <h3>All Images Already Processed!</h3>
+                                <p>All images in this folder have already been processed. Add new images or select a different folder.</p>
+                            </div>
+                        `;
+                    } else {
+                        gallery.innerHTML = `
+                            <div class="empty-state">
+                                <h3>No Images Loaded</h3>
+                                <p>Click "📂 Manage Folders" to add a folder, then click the folder button to load images</p>
+                            </div>
+                        `;
+                    }
+                    return;
+                }
+
+                gallery.innerHTML = '';
+                
+                this.newImages.forEach((image, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'image-card';
+                    card.dataset.index = index;
+                    
+                    const isSelected = this.selectedImages.has(image.fileHash);
+                    if (isSelected) card.classList.add('selected');
+                    
+                    card.innerHTML = `
+                        <div class="selection-indicator">✓ Selected</div>
+                        <img class="image-thumbnail" src="${image.url}" alt="${image.name}" loading="lazy">
+                        <div class="image-info">
+                            <div class="image-title">${image.name}</div>
+                            <div class="image-details">
+                                Size: ${(image.size / 1024 / 1024).toFixed(2)} MB
+                            </div>
+                        </div>
+                    `;
+                    
+                    card.addEventListener('click', () => this.toggleImageSelection(image.fileHash, card));
+                    gallery.appendChild(card);
+                });
+            }
+
+            renderProcessedPresets() {
+                const gallery = this.processedPresetsGallery;
+                
+                if (this.processedPresets.length === 0) {
+                    gallery.innerHTML = `
+                        <div class="empty-state">
+                            <h3>No Processed Presets</h3>
+                            <p>Process some images from the "New Images" tab to build your preset collection</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                gallery.innerHTML = '';
+                
+                this.processedPresets.forEach((preset, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'image-card';
+                    card.dataset.presetIndex = index;
+                    
+                    const promptPreview = preset.metadata.positive_prompt.length > 100 
+                        ? preset.metadata.positive_prompt.substring(0, 100) + '...'
+                        : preset.metadata.positive_prompt;
+                    
+                    const lorasText = preset.metadata.loras.length > 0 
+                        ? preset.metadata.loras.map(l => `${l.name} (${l.strength})`).join(', ')
+                        : 'None';
+                    
+                    card.innerHTML = `
+                        <div class="preset-actions">
+                            <button class="action-btn" onclick="event.stopPropagation(); app.editPresetByIndex(${index})">✏️</button>
+                            <button class="action-btn" onclick="event.stopPropagation(); app.downloadPresetByIndex(${index})">💾</button>
+                        </div>
+                        <img class="image-thumbnail" src="${preset.thumbnailUrl}" alt="${preset.metadata.name}" loading="lazy">
+                        <div class="image-info">
+                            <div class="image-title">${preset.metadata.name}</div>
+                            <div class="image-details">
+                                <strong>Model:</strong> ${preset.metadata.checkpoint}<br>
+                                <strong>CFG:</strong> ${preset.metadata.cfg_scale} | 
+                                <strong>Steps:</strong> ${preset.metadata.steps}<br>
+                                ${preset.metadata.loras.length > 0 ? `<strong>LoRAs:</strong> ${lorasText.substring(0, 50)}${lorasText.length > 50 ? '...' : ''}<br>` : ''}
+                                <strong>Created:</strong> ${new Date(preset.metadata.created).toLocaleDateString()}
+                            </div>
+                            <div class="image-prompt">${promptPreview}</div>
+                        </div>
+                    `;
+                    
+                    card.addEventListener('click', () => this.viewPreset(preset, index));
+                    gallery.appendChild(card);
+                });
+            }
+
+            toggleImageSelection(fileHash, cardElement) {
+                if (this.selectedImages.has(fileHash)) {
+                    this.selectedImages.delete(fileHash);
+                    cardElement.classList.remove('selected');
+                } else {
+                    this.selectedImages.add(fileHash);
+                    cardElement.classList.add('selected');
+                }
+                
+                if (this.currentFolder) {
+                    this.folders.get(this.currentFolder).selectedImages = this.selectedImages;
+                }
+                
+                this.updateButtons();
+            }
+
+            updateButtons() {
+                const hasSelected = this.selectedImages.size > 0;
+                const hasNew = this.newImages.length > 0;
+                
+                this.processSelectedBtn.disabled = !hasSelected;
+                this.processAllBtn.disabled = !hasNew;
+            }
+
+            switchTab(tabName) {
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.classList.remove('active');
+                    if (tab.dataset.tab === tabName) {
+                        tab.classList.add('active');
+                    }
+                });
+                
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(`${tabName}-tab`).classList.add('active');
+            }
+
+            async processSelectedImages() {
+                const selectedHashes = Array.from(this.selectedImages);
+                const imagesToProcess = this.newImages.filter(img => selectedHashes.includes(img.fileHash));
+                
+                for (const image of imagesToProcess) {
+                    await this.processImage(image);
+                }
+                
+                this.selectedImages.clear();
+                if (this.currentFolder) {
+                    this.folders.get(this.currentFolder).selectedImages = this.selectedImages;
+                }
+                this.updateUI();
+                this.saveToStorage();
+            }
+
+            async processAllImages() {
+                if (!confirm(`Process all ${this.newImages.length} images? This will open metadata forms for each image.`)) {
+                    return;
+                }
+                
+                for (const image of this.newImages) {
+                    await this.processImage(image);
+                }
+                
+                this.updateUI();
+                this.saveToStorage();
+            }
+
+            async processImage(imageData) {
+                return new Promise((resolve) => {
+                    this.currentProcessingImage = imageData;
+                    this.currentEditingPreset = null;
+                    this.showMetadataModal(imageData, resolve);
+                });
+            }
+
+            showMetadataModal(imageData, callback) {
+                document.getElementById('modalTitle').textContent = '📝 Create Preset';
+                document.getElementById('processingImageName').textContent = `Processing: ${imageData.name}`;
+                
+                document.getElementById('presetName').value = imageData.name.replace(/\.[^/.]+$/, "");
+                document.getElementById('positivePrompt').value = '';
+                document.getElementById('negativePrompt').value = '';
+                document.getElementById('checkpoint').value = '';
+                document.getElementById('cfgScale').value = '7.5';
+                document.getElementById('steps').value = '25';
+                document.getElementById('sampler').value = 'DPM++ 2M Karras';
+                document.getElementById('seed').value = '';
+                document.getElementById('notes').value = '';
+                
+                this.loraContainer.innerHTML = '';
+                this.metadataModal.style.display = 'block';
+                this.currentProcessCallback = callback;
+            }
+
+            async saveCurrentPreset() {
+                const presetNameValue = document.getElementById('presetName').value;
+                const positivePromptValue = document.getElementById('positivePrompt').value;
+                const negativePromptValue = document.getElementById('negativePrompt').value;
+                const checkpointValue = document.getElementById('checkpoint').value;
+                const cfgScaleValue = document.getElementById('cfgScale').value;
+                const stepsValue = document.getElementById('steps').value;
+                const samplerValue = document.getElementById('sampler').value;
+                const seedValue = document.getElementById('seed').value;
+                const notesValue = document.getElementById('notes').value;
+                
+                const loraData = this.collectLoraData();
+                
+                const metadata = {
+                    name: presetNameValue || 'Unnamed Preset',
+                    positive_prompt: positivePromptValue,
+                    negative_prompt: negativePromptValue,
+                    checkpoint: checkpointValue,
+                    loras: loraData,
+                    cfg_scale: parseFloat(cfgScaleValue) || 7.5,
+                    steps: parseInt(stepsValue) || 25,
+                    sampler: samplerValue,
+                    seed: seedValue,
+                    notes: notesValue,
+                    created: this.currentEditingPreset !== null 
+                        ? this.processedPresets[this.currentEditingPreset].metadata.created
+                        : new Date().toISOString(),
+                    modified: this.currentEditingPreset !== null ? new Date().toISOString() : undefined,
+                    original_file: this.currentProcessingImage.name
+                };
+
+                let preset;
+                
+                if (this.currentEditingPreset !== null) {
+                    preset = {
+                        ...this.processedPresets[this.currentEditingPreset],
+                        metadata: metadata
+                    };
+                    
+                    this.processedPresets[this.currentEditingPreset] = preset;
+                    
+                    if (this.currentFolder) {
+                        const folderData = this.folders.get(this.currentFolder);
+                        folderData.processedPresets = this.processedPresets;
+                    }
+                } else {
+                    const thumbnailUrl = await this.createThumbnail(this.currentProcessingImage.url);
+                    
+                    preset = {
+                        fileHash: this.currentProcessingImage.fileHash,
+                        metadata: metadata,
+                        thumbnailUrl: thumbnailUrl,
+                        originalUrl: this.currentProcessingImage.url
+                    };
+
+                    this.processedPresets.push(preset);
+                    this.newImages = this.newImages.filter(img => img.fileHash !== this.currentProcessingImage.fileHash);
+                    
+                    if (this.currentFolder) {
+                        const folderData = this.folders.get(this.currentFolder);
+                        folderData.processedPresets = this.processedPresets;
+                        folderData.newImages = this.newImages;
+                    }
+                }
+                
+                this.closeActiveModal();
+                if (this.currentProcessCallback) {
+                    this.currentProcessCallback(preset);
+                    this.currentProcessCallback = null;
+                }
+                
+                this.updateUI();
+                this.saveToStorage();
+            }
+
+            updateUI() {
+                this.renderNewImages();
+                this.renderProcessedPresets();
+                this.updateCounts();
+                this.updateButtons();
+            }
+
+            updateCounts() {
+                this.newCount.textContent = this.newImages.length;
+                this.processedCount.textContent = this.processedPresets.length;
+            }
+
+            updateStatus(message) {
+                this.statusText.textContent = message;
+            }
+
+            showProgress(show) {
+                this.progressBar.style.display = show ? 'block' : 'none';
+                if (!show) this.updateProgress(0);
+            }
+
+            updateProgress(percentage) {
+                this.progressFill.style.width = `${percentage}%`;
+            }
+
+            saveFoldersToStorage() {
+                // Save folder configs (without cached images which are too large)
+                const foldersToSave = this.savedFolders.map(f => ({
+                    id: f.id,
+                    name: f.name,
+                    hasDirectoryHandle: f.hasDirectoryHandle
+                }));
+                localStorage.setItem('aiPresetManagerFolders', JSON.stringify(foldersToSave));
+            }
+
+            saveToStorage() {
+                const data = {
+                    currentFolder: this.currentFolder,
+                    currentFolderId: this.currentFolderId,
+                    folders: {}
+                };
+                
+                this.folders.forEach((folderData, folderPath) => {
+                    data.folders[folderPath] = {
+                        processedPresets: folderData.processedPresets.map(preset => ({
+                            fileHash: preset.fileHash,
+                            metadata: preset.metadata,
+                            thumbnailUrl: preset.thumbnailUrl
+                        }))
+                    };
+                });
+
+                localStorage.setItem('aiPresetManagerUniversal', JSON.stringify(data));
+            }
+
+            loadFromStorage() {
+                // Load saved folders configuration
+                const savedFoldersData = localStorage.getItem('aiPresetManagerFolders');
+                if (savedFoldersData) {
+                    this.savedFolders = JSON.parse(savedFoldersData).map(f => ({
+                        ...f,
+                        cachedImages: [] // Start with empty cache
+                    }));
+                }
+
+                // Load preset data
+                let data = localStorage.getItem('aiPresetManagerUniversal');
+                
+                if (!data) {
+                    const oldData = localStorage.getItem('aiPresetManagerPro');
+                    if (oldData) {
+                        const parsed = JSON.parse(oldData);
+                        if (parsed.processedPresets) {
+                            const folderName = parsed.currentFolder || 'Migrated_Presets';
+                            this.folders.set(folderName, {
+                                newImages: [],
+                                processedPresets: parsed.processedPresets,
+                                selectedImages: new Set()
+                            });
+                            
+                            this.currentFolder = folderName;
+                            this.processedPresets = parsed.processedPresets;
+                            
+                            this.saveToStorage();
+                            this.updateStatus('Migrated presets from previous version');
+                            return;
+                        }
+                    }
+                    return;
+                }
+                
+                const parsed = JSON.parse(data);
+                this.currentFolder = parsed.currentFolder;
+                this.currentFolderId = parsed.currentFolderId;
+                
+                if (parsed.folders) {
+                    Object.entries(parsed.folders).forEach(([folderPath, folderData]) => {
+                        this.folders.set(folderPath, {
+                            newImages: [],
+                            processedPresets: folderData.processedPresets || [],
+                            selectedImages: new Set()
+                        });
+                    });
+                    
+                    if (this.currentFolder && this.folders.has(this.currentFolder)) {
+                        const folderData = this.folders.get(this.currentFolder);
+                        this.processedPresets = folderData.processedPresets;
+                        this.selectedImages = folderData.selectedImages;
+                        
+                        this.currentFolderPath.textContent = this.currentFolder;
+                        this.folderInfo.style.display = 'block';
+                    }
+                }
+            }
+
+            clearAllData() {
+                if (!confirm('This will delete all processed presets and clear the application data. Are you sure?')) {
+                    return;
+                }
+                
+                localStorage.removeItem('aiPresetManagerUniversal');
+                localStorage.removeItem('aiPresetManagerPro');
+                localStorage.removeItem('aiPresetManagerFolders');
+                
+                // Clear IndexedDB
+                try {
+                    indexedDB.deleteDatabase('AIPresetManager');
+                } catch (e) {}
+                
+                this.folders.clear();
+                this.savedFolders = [];
+                this.processedPresets = [];
+                this.newImages = [];
+                this.selectedImages.clear();
+                this.currentFolder = null;
+                this.currentFolderId = null;
+                this.folderInfo.style.display = 'none';
+                this.renderSavedFolderButtons();
+                this.updateUI();
+                this.updateStatus('All data cleared');
+            }
+
+            viewPreset(preset, index) {
+                this.currentEditingPreset = index;
+                
+                document.getElementById('viewerImageName').textContent = preset.metadata.name;
+                document.getElementById('presetViewerImage').src = preset.originalUrl || preset.thumbnailUrl;
+                
+                document.getElementById('viewerPresetName').textContent = preset.metadata.name;
+                document.getElementById('viewerCheckpoint').textContent = preset.metadata.checkpoint || 'Not specified';
+                document.getElementById('viewerPositivePrompt').textContent = preset.metadata.positive_prompt || 'Not specified';
+                document.getElementById('viewerNegativePrompt').textContent = preset.metadata.negative_prompt || 'Not specified';
+                document.getElementById('viewerCfg').textContent = preset.metadata.cfg_scale || 'Not specified';
+                document.getElementById('viewerSteps').textContent = preset.metadata.steps || 'Not specified';
+                document.getElementById('viewerSampler').textContent = preset.metadata.sampler || 'Not specified';
+                document.getElementById('viewerSeed').textContent = preset.metadata.seed || 'Random';
+                document.getElementById('viewerNotes').textContent = preset.metadata.notes || 'No notes';
+                
+                const loraList = document.getElementById('viewerLoraList');
+                const loraSection = document.getElementById('loraSection');
+                
+                loraList.innerHTML = '';
+                
+                if (preset.metadata.loras && Array.isArray(preset.metadata.loras) && preset.metadata.loras.length > 0) {
+                    loraList.classList.remove('empty');
+                    
+                    preset.metadata.loras.forEach((lora) => {
+                        const loraItem = document.createElement('div');
+                        loraItem.className = 'lora-item';
+                        
+                        const loraName = lora.name || 'Unknown LoRA';
+                        const loraStrength = lora.strength || 1.0;
+                        
+                        loraItem.innerHTML = `
+                            <div class="lora-name">${loraName}</div>
+                            <div class="lora-strength">Strength: ${loraStrength}</div>
+                        `;
+                        
+                        loraList.appendChild(loraItem);
+                    });
+                    
+                    loraSection.style.display = 'block';
+                } else {
+                    loraList.classList.add('empty');
+                    loraList.innerHTML = '<div>No LoRAs used in this preset</div>';
+                    loraSection.style.display = 'block';
+                }
+                
+                if (preset.metadata.notes && preset.metadata.notes.trim()) {
+                    document.getElementById('notesSection').style.display = 'block';
+                } else {
+                    document.getElementById('notesSection').style.display = 'none';
+                }
+                
+                this.presetViewerModal.style.display = 'block';
+            }
+
+            editPresetByIndex(index) {
+                this.editPreset(this.processedPresets[index], index);
+            }
+
+            downloadPresetByIndex(index) {
+                this.downloadPresetFiles(this.processedPresets[index]);
+            }
+
+            editCurrentPreset() {
+                if (this.currentEditingPreset !== null) {
+                    this.editPreset(this.processedPresets[this.currentEditingPreset], this.currentEditingPreset);
+                }
+            }
+
+            downloadCurrentPreset() {
+                if (this.currentEditingPreset !== null) {
+                    this.downloadPresetFiles(this.processedPresets[this.currentEditingPreset]);
+                }
+            }
+
+            editPreset(preset, index) {
+                this.currentEditingPreset = index;
+                this.currentProcessingImage = { name: preset.metadata.original_file };
+                
+                this.presetViewerModal.style.display = 'none';
+                
+                document.getElementById('modalTitle').textContent = '✏️ Edit Preset';
+                document.getElementById('processingImageName').textContent = `Editing: ${preset.metadata.name}`;
+                
+                document.getElementById('presetName').value = preset.metadata.name;
+                document.getElementById('positivePrompt').value = preset.metadata.positive_prompt;
+                document.getElementById('negativePrompt').value = preset.metadata.negative_prompt;
+                document.getElementById('checkpoint').value = preset.metadata.checkpoint;
+                document.getElementById('cfgScale').value = preset.metadata.cfg_scale;
+                document.getElementById('steps').value = preset.metadata.steps;
+                document.getElementById('sampler').value = preset.metadata.sampler;
+                document.getElementById('seed').value = preset.metadata.seed;
+                document.getElementById('notes').value = preset.metadata.notes;
+                
+                this.loraContainer.innerHTML = '';
+                
+                if (preset.metadata.loras && Array.isArray(preset.metadata.loras)) {
+                    preset.metadata.loras.forEach((lora) => {
+                        this.addLoraEntry(lora.name || '', lora.strength || 1.0);
+                    });
+                }
+                
+                this.metadataModal.style.display = 'block';
+                
+                this.currentProcessCallback = (updatedPreset) => {
+                    if (updatedPreset) {
+                        this.processedPresets[index] = updatedPreset;
+                        if (this.currentFolder) {
+                            this.folders.get(this.currentFolder).processedPresets = this.processedPresets;
+                        }
+                        this.updateUI();
+                        this.saveToStorage();
+                    }
+                };
+            }
+
+            closeActiveModal() {
+                this.metadataModal.style.display = 'none';
+                this.presetViewerModal.style.display = 'none';
+                
+                if (this.currentProcessCallback) {
+                    this.currentProcessCallback(null);
+                    this.currentProcessCallback = null;
+                }
+                this.currentEditingPreset = null;
+            }
+
+            addLoraEntry(name = '', strength = 1.0) {
+                const loraGroup = document.createElement('div');
+                loraGroup.className = 'lora-group';
+                
+                const uniqueId = Date.now() + Math.random();
+                loraGroup.setAttribute('data-lora-id', uniqueId);
+                
+                const nameLabel = document.createElement('div');
+                nameLabel.className = 'lora-label';
+                nameLabel.textContent = 'Name:';
+                
+                const nameInput = document.createElement('input');
+                nameInput.type = 'text';
+                nameInput.className = 'lora-name';
+                nameInput.placeholder = 'e.g., style_lora.safetensors';
+                nameInput.value = name;
+                nameInput.setAttribute('data-lora-name', uniqueId);
+                
+                const strengthLabel = document.createElement('div');
+                strengthLabel.className = 'lora-label';
+                strengthLabel.textContent = 'Strength:';
+                
+                const strengthInput = document.createElement('input');
+                strengthInput.type = 'number';
+                strengthInput.className = 'lora-strength';
+                strengthInput.value = strength;
+                strengthInput.step = '0.1';
+                strengthInput.min = '0';
+                strengthInput.max = '2';
+                strengthInput.placeholder = '1.0';
+                strengthInput.setAttribute('data-lora-strength', uniqueId);
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'lora-remove';
+                removeBtn.textContent = '×';
+                removeBtn.onclick = () => {
+                    loraGroup.remove();
+                };
+                
+                loraGroup.appendChild(nameLabel);
+                loraGroup.appendChild(nameInput);
+                loraGroup.appendChild(strengthLabel);
+                loraGroup.appendChild(strengthInput);
+                loraGroup.appendChild(removeBtn);
+                
+                this.loraContainer.appendChild(loraGroup);
+                
+                setTimeout(() => {
+                    nameInput.focus();
+                }, 50);
+                
+                return loraGroup;
+            }
+
+            collectLoraData() {
+                const loras = [];
+                const loraGroups = this.loraContainer.querySelectorAll('.lora-group');
+                
+                loraGroups.forEach((group) => {
+                    let nameInput = group.querySelector('.lora-name');
+                    let strengthInput = group.querySelector('.lora-strength');
+                    
+                    if (!nameInput || !strengthInput) {
+                        const inputs = group.querySelectorAll('input');
+                        inputs.forEach((input) => {
+                            if (input.type === 'text' && !nameInput) {
+                                nameInput = input;
+                            } else if (input.type === 'number' && !strengthInput) {
+                                strengthInput = input;
+                            }
+                        });
+                    }
+                    
+                    if (nameInput && strengthInput) {
+                        const name = nameInput.value.trim();
+                        const strength = parseFloat(strengthInput.value) || 1.0;
+                        
+                        if (name) {
+                            loras.push({
+                                name: name,
+                                strength: strength
+                            });
+                        }
+                    }
+                });
+                
+                return loras;
+            }
+
+            async createThumbnail(imageUrl) {
+                return new Promise((resolve) => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const img = new Image();
+                    
+                    img.onload = () => {
+                        const size = 200;
+                        canvas.width = size;
+                        canvas.height = size;
+                        
+                        const scale = Math.min(size / img.width, size / img.height);
+                        const x = (size - img.width * scale) / 2;
+                        const y = (size - img.height * scale) / 2;
+                        
+                        ctx.fillStyle = '#000';
+                        ctx.fillRect(0, 0, size, size);
+                        ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+                        
+                        resolve(canvas.toDataURL('image/jpeg', 0.8));
+                    };
+                    
+                    img.src = imageUrl;
+                });
+            }
+
+            downloadPresetFiles(preset) {
+                const jsonBlob = new Blob([JSON.stringify(preset.metadata, null, 2)], 
+                    { type: 'application/json' });
+                this.downloadFile(jsonBlob, `${this.sanitizeFilename(preset.metadata.name)}_metadata.json`);
+                
+                fetch(preset.thumbnailUrl)
+                    .then(res => res.blob())
+                    .then(blob => {
+                        this.downloadFile(blob, `${this.sanitizeFilename(preset.metadata.name)}_thumbnail.jpg`);
+                    });
+                
+                if (preset.originalUrl) {
+                    fetch(preset.originalUrl)
+                        .then(res => res.blob())
+                        .then(blob => {
+                            const ext = preset.metadata.original_file.split('.').pop();
+                            this.downloadFile(blob, `${this.sanitizeFilename(preset.metadata.name)}_original.${ext}`);
+                        });
+                }
+            }
+
+            downloadFile(blob, filename) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
+            sanitizeFilename(filename) {
+                return filename.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            }
+
+            exportGallery() {
+                if (this.processedPresets.length === 0) {
+                    alert('No processed presets to export!');
+                    return;
+                }
+                
+                const html = this.generateGalleryHTML();
+                const blob = new Blob([html], { type: 'text/html' });
+                this.downloadFile(blob, `ai_presets_gallery_${this.sanitizeFilename(this.currentFolder || 'presets')}.html`);
+            }
+
+            generateGalleryHTML() {
+                const presetsHTML = this.processedPresets.map(preset => {
+                    const promptPreview = preset.metadata.positive_prompt.substring(0, 150);
+                    const lorasText = preset.metadata.loras.map(l => `${l.name} (${l.strength})`).join(', ');
+                    
+                    return `
+                        <div class="preset-card">
+                            <img src="${preset.thumbnailUrl}" alt="${preset.metadata.name}">
+                            <div class="preset-info">
+                                <h3>${preset.metadata.name}</h3>
+                                <p><strong>Model:</strong> ${preset.metadata.checkpoint}</p>
+                                <p><strong>CFG:</strong> ${preset.metadata.cfg_scale} | <strong>Steps:</strong> ${preset.metadata.steps}</p>
+                                ${preset.metadata.loras.length > 0 ? `<p><strong>LoRAs:</strong> ${lorasText}</p>` : ''}
+                                <div class="prompt">${promptPreview}${preset.metadata.positive_prompt.length > 150 ? '...' : ''}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                return `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Presets Gallery - ${this.currentFolder || 'Presets'}</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #1a1a1a; color: white; padding: 20px; }
+        h1 { text-align: center; color: #4a9eff; }
+        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        .preset-card { background: #2a2a2a; border-radius: 10px; padding: 20px; }
+        .preset-card img { width: 100%; height: 200px; object-fit: cover; border-radius: 5px; }
+        .preset-info h3 { color: #4a9eff; margin: 15px 0 10px 0; }
+        .preset-info p { margin: 5px 0; font-size: 14px; }
+        .prompt { background: #333; padding: 10px; border-radius: 5px; margin-top: 10px; font-size: 12px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>🎨 AI Presets Gallery - ${this.currentFolder || 'Presets'}</h1>
+    <p style="text-align: center; color: #666; margin-bottom: 30px;">
+        Generated on ${new Date().toLocaleString()} | ${this.processedPresets.length} presets
+    </p>
+    <div class="gallery">${presetsHTML}</div>
+</body>
+</html>
+                `;
+            }
+        }
+
+        // Initialize the application when the page loads
+        let app;
+        document.addEventListener('DOMContentLoaded', () => {
+            app = new AIPresetManagerFixed();
+        });
+    </script>
+</body>
+</html>
