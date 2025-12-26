@@ -8,12 +8,14 @@ A self-contained HTML application for managing AI-generated images and organizin
 
 ## ✨ Features
 
+- **Local File Storage** - Preset data saved as JSON files alongside your images (survives browser cache clears!)
 - **Folder Management** - Save multiple image folders and switch between them instantly
 - **Image Processing** - Catalog your AI images with full metadata including prompts, models, LoRAs, and generation settings
 - **Preset Library** - Build a searchable collection of your processed presets
+- **Auto-Load Presets** - Existing preset files are automatically detected when loading a folder
 - **Metadata Tracking** - Store positive/negative prompts, checkpoint models, LoRA configurations with strengths, CFG scale, steps, sampler, seed, and custom notes
 - **Export Gallery** - Generate standalone HTML galleries of your preset collections
-- **100% Local** - All data stays on your computer using browser localStorage and IndexedDB
+- **100% Local** - All data stays on your computer, no servers or cloud
 - **No Installation** - Single HTML file, no server or dependencies required
 
 ## 🚀 Quick Start
@@ -98,17 +100,40 @@ A self-contained HTML application for managing AI-generated images and organizin
 
 ## 💾 Data Storage
 
-All data is stored locally in your browser:
+### Local File Storage (New!)
 
-- **localStorage** - Folder configurations and processed preset metadata
+When you process an image, the app saves files directly to your image folder:
+
+- `imagename_preset.json` - All metadata (prompts, model, LoRAs, settings)
+- `imagename_thumb.jpg` - Thumbnail image
+
+**This means:**
+- ✅ Clear browser cache? No problem - just re-add the folder and presets reload automatically
+- ✅ Move images to another computer? The preset data travels with them
+- ✅ Back up your image folder? Presets are included
+- ✅ Share a folder? Recipients get your presets too
+
+### Browser Storage (Supplementary)
+
+The app also uses browser storage for folder configurations:
+
+- **localStorage** - Folder names and settings
 - **IndexedDB** - Directory handles for Chrome/Edge persistent access
-- **Memory** - Cached images for instant folder switching
 
-**Your data never leaves your computer.** There are no servers, no cloud storage, no tracking.
+### Browser Differences
+
+| Feature | Chrome/Edge | Firefox |
+|---------|:-----------:|:-------:|
+| Auto-save to folder | ✅ Automatic | ⬇️ Downloads for manual save |
+| Read existing presets | ✅ | ✅ |
+
+**Chrome/Edge:** Files are written directly to your image folder - completely automatic.
+
+**Firefox:** When you save a preset, the JSON and thumbnail files download. You need to manually move them to your image folder. When loading, Firefox reads these files normally.
 
 ### Clearing Data
 
-Click **"Clear All Data"** to remove all saved folders and presets. This cannot be undone.
+Click **"Clear All Data"** to remove browser-stored folder configurations. **Your preset files in the image folders are NOT deleted** - they stay safe with your images.
 
 ## ⌨️ Keyboard Shortcuts
 
@@ -136,16 +161,17 @@ That's it! Everything is contained in one HTML file including all CSS and JavaSc
 
 ## 📝 Tips
 
-1. **Keep the tab open** - Minimizing instead of closing preserves loaded folders
-2. **Use Chrome/Edge** - Best experience with File System Access API
+1. **Use Chrome/Edge for best experience** - Automatic file saving to your folders
+2. **Firefox users** - When prompted, save downloaded files to the same folder as your images
 3. **Organize by project** - Create separate folders for different art projects
-4. **Regular exports** - Export galleries as backups of your presets
+4. **Regular backups** - Your image folders now contain all preset data - back them up!
+5. **Moving computers** - Just copy your image folder - presets come with it
 
 ## 🐛 Known Limitations
 
-- Browser security prevents permanent file system access - some re-authorization required after closing
+- Firefox requires manual file saving (downloads files instead of writing directly)
 - Very large folders (1000+ images) may take a moment to load
-- Cached images are stored in memory, not persisted to disk
+- Browser security requires re-authorization after closing (but your preset files remain safe in the folder)
 
 ## 📄 License
 
