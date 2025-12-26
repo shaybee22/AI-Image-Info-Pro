@@ -20,7 +20,7 @@ A self-contained HTML application for managing AI-generated images and organizin
 
 ## 🚀 Quick Start
 
-1. **Download** the `aiartinfopro.html` file
+1. **Download** the `aiimageinfoprov2.html` file
 2. **Open** it in your web browser (Chrome/Edge recommended)
 3. **Click** "Manage Folders" to add your first image folder
 4. **Browse** to select a folder containing AI-generated images
@@ -146,7 +146,7 @@ Click **"Clear All Data"** to remove browser-stored folder configurations. **You
 ## 📁 File Structure
 
 ```
-aiartinfopro.html    # The entire application (single file)
+aiimageinfoprov2.html    # The entire application (single file)
 ```
 
 That's it! Everything is contained in one HTML file including all CSS and JavaScript.
