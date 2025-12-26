@@ -1,4 +1,4 @@
-# 🎨 AI Image Info Pro
+# 🎨 AI Image Info Pro V2
 
 A self-contained HTML application for managing AI-generated images and organizing the metadata, prompts, and settings used to create them.
 
